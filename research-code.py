@@ -3,15 +3,14 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 import time
 
-# Define the initial position and speed of the car
-x_position = 0.0   # meters
-y_position = 50.0   # meters
-speed = 3.0       # meters per second
+# Define the initial position and speed of the cars
+car1_x_position1 = 0.0   # meters
+car1_y_position1 = 50.0   # meters
+car1_speed = 3.0       # meters per second
 
-# Define initial position for car 2
-x_position2 = 50.0
-y_position2 = 0.0
-speed2 = 5.0
+car2_x_position2 = 0.0   # meters
+car2_y_position2 = 30.0   # meters
+car2_speed = 2.0       # meters per second
 
 # Define the time increment for each simulation step
 delta_t = 0.1      # seconds
@@ -31,62 +30,109 @@ axes.set_ylim(0, 100)
 axes.set_xlabel('X Position (m)')
 axes.set_ylabel('Y Position (m)')
 
-# Create a new line object to represent the car's motion
-line, = axes.plot([x_position], [50], '-o')
+# Create a label to display the current position of the first car
+position_label1 = tk.Label(root, text="Car 1 Position: ({:.1f}, {:.1f})".format(car1_x_position1, car1_y_position1))
+position_label1.pack()
+
+# Create a label to display the current position of the second car
+position_label2 = tk.Label(root, text="Car 2 Position: ({:.1f}, {:.1f})".format(car2_x_position2, car2_y_position2))
+position_label2.pack()
+
+# Create a new line object to represent the first car's motion
+car1_line, = axes.plot([car1_x_position1], [car1_y_position1], '-o', label='Car 1')
+
+# Create a new line object to represent the second car's motion
+car2_line, = axes.plot([car2_x_position2], [car2_y_position2], '-o', label='Car 2')
+
+axes.legend()
 
 # Create a canvas to display the matplotlib figure in the tkinter window
 canvas = FigureCanvasTkAgg(fig, master=root)
 canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 
-# Create a label to display the current position of the car
-position_label = tk.Label(root, text="Position: ({:.1f}, {:.1f})".format(x_position, y_position))
+# Create a label to display the current position of the cars
+position_label = tk.Label(root, text="Car 1 Position: ({:.1f}, {:.1f})\nCar 2 Position: ({:.1f}, {:.1f})".format(car1_x_position1, car1_y_position1, car2_x_position2, car2_y_position2))
 position_label.pack()
 
 last_update_time = time.time()
 
-# Define a function to update the position of the car and the label
+# Define a function to update the position of the cars and the labels
 def update_position():
-    global x_position, y_position, last_update_time
+    global car1_x_position1, car1_y_position1, car2_x_position2, car2_y_position2, last_update_time
+
+    # Update the position of the first car
     current_time = time.time()
     elapsed_time = current_time - last_update_time
     last_update_time = current_time
-    distance = speed * elapsed_time
-    x_position += distance
-    y_position += distance
-    position_label.config(text="Position: ({:.1f}, {:.1f})".format(x_position, y_position))
-    line.set_xdata([line.get_xdata()[-1], x_position])
-    line.set_ydata([line.get_ydata()[-1], 50])
-    # = [] create array to store data points
+    distance = car1_speed * elapsed_time
+    car1_x_position1 += 0
+    car1_y_position1 += -5
+    position_label1.config(text="Car 1 Position: ({:.1f}, {:.1f})".format(car1_x_position1, car1_y_position1))
+    car1_line.set_xdata([car1_x_position1])
+    car1_line.set_ydata([car1_y_position1])
 
+    # Update the position of the second car
+    car2_x_position2 += car2_speed * elapsed_time
+    car2_y_position2 += car2_speed * elapsed_time
+    position_label2.config(text="Car 2 Position: ({:.1f}, {:.1f})".format(car2_x_position2, car2_y_position2))
+    car2_line.set_xdata([car2_x_position2])
+    car2_line.set_ydata([car2_y_position2])
+
+    # Redraw the canvas
     axes.relim()
     axes.autoscale_view(True,True,True)
     canvas.draw()
-    if x_position <= axes.get_xlim()[1]:
+
+    # Check if the first car has reached the end of the road
+    if car1_x_position1 <= axes.get_xlim()[1]:
         root.after(100, update_position)
+
+    # If the first car has reached the end of the road, reset its position
     else:
-        x_position = 0.0
-        y_position = 0.0
-        line.set_xdata([x_position])
-        line.set_ydata([y_position])
+        car1_x_position1 = 0.0
+        car1_y_position1 = 50.0
+        car1_line.set_xdata([car1_x_position1])
+        car1_line.set_ydata([car1_y_position1])
+        position_label1.config(text="Car 1 Position: ({:.1f}, {:.1f})".format(car1_x_position1, car1_y_position1))
         axes.relim()
         axes.autoscale_view(True,True,True)
         canvas.draw()
 
+    # Check if the second car has reached the end of the road
+if car2_x_position2 <= axes.get_xlim()[1]:
+    root.after(100, update_position)
+
+# If the second car has reached the end of the road, reset its position
+elif car1_x_position1 <= axes.get_xlim()[1]:
+    car2_x_position2 = 0.0
+    car2_y_position2 = 30.0
+    car2_line.set_xdata([car2_x_position2])
+    car2_line.set_ydata([car2_y_position2])
+    position_label2.config(text="Car 2 Position: ({:.1f}, {:.1f})".format(car2_x_position2, car2_y_position2))
+    axes.relim()
+    axes.autoscale_view(True,True,True)
+    canvas.draw()
+
+
 # Define a function to start the simulation
 def start_simulation():
-    global x_position, y_position, line
-    x_position = 0.0
-    y_position = 0.0
-    line.set_xdata([x_position])
-    line.set_ydata([y_position])
+    global x_position1, y_position1, x_position2, y_position2, line1, line2
+
+    # Reset the positions of the cars
+    x_position1 = 0.0
+    y_position1 = 50.0
+    x_position2 = 0.0
+    y_position2 = 25.0
+    # Update the lines to represent the new positions
+    car1_line.set_xdata([car1_x_position1])
+    car1_line.set_ydata([car1_y_position1])
+    car2_line.set_xdata([car2_x_position2])
+    car2_line.set_ydata([car2_y_position2])
     axes.relim()
     axes.autoscale_view(True,True,True)
     canvas.draw()
     update_position()
 
-# Add a button to start the simulation
-start_button = tk.Button(root, text="Start", command=start_simulation)
-start_button.pack()
-
-# Start the tkinter main loop
+#start_button = tk.Button(root, text='Start', command=start_simulation)
+#start_button.pack()
 root.mainloop()
