@@ -6,13 +6,13 @@ from nav_msgs.msg import Odometry
 while(1):
 
     def distance_2(data):
-        x2
+        x2  # from data.pose.pose.position.x 
     def speed_2(data):
-        odom2
+        odom2 # from odom.twist.twist.linear.x
     def distance_1(data):
-        x1
+        x1 # from data.pose.pose.position.x
     def speed_1(data):
-        odom1
+        odom1 # from odom.twist.twist.linear.x
 
 Tc2 = (distance_2/speed_2)
 Ts1 = (distance_1/speed_1)
