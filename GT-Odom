@@ -1,1 +1,26 @@
+#!/usr/bin/env python
 
+import rospy 
+from nav_msgs.msg import Odometry
+
+while(1):
+
+    def distance_2(data):
+        x2
+    def speed_2(data):
+        odom2
+    def distance_1(data):
+        x1
+    def speed_1(data):
+        odom1
+
+Tc2 = (distance_2/speed_2)
+Ts1 = (distance_1/speed_1)
+
+a11 = (Tc2-Ts1-1) #stop
+a12 = (Ts1-Tc2+1) #forward
+
+if a11 > a12:
+    rospy #stop ego
+
+    else #ego keeps moving forward
