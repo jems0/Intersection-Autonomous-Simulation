@@ -1,26 +1,82 @@
 #!/usr/bin/env python
 
-import rospy 
+from cmath import sqrt
+import rospy
 from nav_msgs.msg import Odometry
+
+x1 =0.0 
+x2 =0.0 
+y1=0.0
+y2=0.0
+z1=0.0
+z2 =0.0
+
+
+
+# define the callback function for the odom topic
+def car1_odom_callback(data):
+    global x1 ,y1 , z1 
+    x1= data.pose.pose.position.x
+    y1= data.pose.pose.position.y
+    z1= data.pose.pose.position.z
+    rospy.loginfo("Received odom data: x=%f, y=%f, z=%f", 
+                  x1, y1, z1)
+
+
+
+def car2_odom_callback(data):
+    global x2 ,y2 , z2 
+    x2= data.pose.pose.position.x
+    y2= data.pose.pose.position.y
+    z2= data.pose.pose.position.z
+    rospy.loginfo("Received odom data: x=%f, y=%f, z=%f", 
+                  x2, y2, z2)
+
+if __name__ == '__main__':
+    # initialize the node
+    rospy.init_node('odom_subscriber')
+    
+    # specify the ROS master URIs of the two cars
+    rospy.set_param('car1_uri', 'http://<car1_ip_address>:11311')
+    rospy.set_param('car2_uri', 'http://<car2_ip_address>:11311')
+
+     # subscribe to the first car's odom topic
+    car1_odom_subscriber = rospy.Subscriber('/car1/odom', Odometry, car1_odom_callback)
+    
+    # subscribe to the second car's odom topic
+    car2_odom_subscriber = rospy.Subscriber('/car2/odom', Odometry, car2_odom_callback)
+
+    
+    # spin the node to keep it running
+    rospy.spin()
+
+
+
+
 
 while(1):
 
-    def distance_2(data):
-        x2  # from data.pose.pose.position.x 
-    def speed_2(data):
-        odom2 # from odom.twist.twist.linear.x
-    def distance_1(data):
-        x1 # from data.pose.pose.position.x
-    def speed_1(data):
-        odom1 # from odom.twist.twist.linear.x
+    distance_1= sqrt((x1*x1)+(y1*y1))
+    distance_2= sqrt((x2*x2)+(y2*y2))
 
-Tc2 = (distance_2/speed_2)
-Ts1 = (distance_1/speed_1)
+    #def distance_2(data):
+      #  x2  # from data.pose.pose.position.x 
+    #def speed_2(data):
+       # odom2 # from odom.twist.twist.linear.x
+   # def distance_1(data):
+        #x1 # from data.pose.pose.position.x
+    #def speed_1(data):
+        #odom1 # from odom.twist.twist.linear.x
+
+    Tc2 = (distance_2/2)#Time to collision 2->1
+    Ts1 = (distance_1/2)#Time to safely cross intersection ego1
 
 a11 = (Tc2-Ts1-1) #stop
 a12 = (Ts1-Tc2+1) #forward
 
-if a11 > a12:
-    rospy #stop ego
+#if a11 > a12:
+    
+ #   car1_odom_callback(data=x1) 
+    
+#else #ego keeps moving forward
 
-    else #ego keeps moving forward
