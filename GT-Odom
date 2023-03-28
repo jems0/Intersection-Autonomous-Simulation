@@ -6,13 +6,22 @@ import rospy
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Point, Twist
 
-
 x1 =0.0 
 x2 =0.0 
 y1=0.0
 y2=0.0
 z1=0.0
 z2 =0.0
+
+theta1 = 1
+theta2 = 1
+theta3 = 1
+theta4 = 1
+beta = 0.5
+r12 = 1
+
+vel1 = 2
+vel2 = 2
 
 class PublishThread(threading.Thread):
     def __init__(self, rate):
@@ -35,7 +44,6 @@ class PublishThread(threading.Thread):
             self.timeout = None
 
         self.start()
-    
 
 # define the callback function for the odom topic
 def car1_odom_callback(data):
@@ -61,8 +69,8 @@ if __name__ == '__main__':
     rospy.init_node('odom_subscriber')
     
     # specify the ROS master URIs of the two cars
-    rospy.set_param('car1_uri', 'http://<10.0.0.3>:11311')
-    rospy.set_param('car2_uri', 'http://<10.0.0.4>:11311')
+    rospy.set_param('car1_uri', 'http://<car1_ip_address>:11311')
+    rospy.set_param('car2_uri', 'http://<car2_ip_address>:11311')
 
      # subscribe to the first car's odom topic
     car1_odom_subscriber = rospy.Subscriber('/car1/odom', Odometry, car1_odom_callback)
@@ -75,12 +83,9 @@ if __name__ == '__main__':
     rospy.spin()
 
 
-
-
-
 while(1):
 
-    distance_1= sqrt((x1*x1)+(y1*y1))
+    distance_1= sqrt((x1*x1)+(y1*y1)) #calculate distance from odom 
     distance_2= sqrt((x2*x2)+(y2*y2))
 
     #def distance_2(data):
@@ -92,15 +97,16 @@ while(1):
     #def speed_1(data):
         #odom1 # from odom.twist.twist.linear.x
 
-    Tc2 = (distance_2/2)#Time to collision 2->1
-    Ts1 = (distance_1/2)#Time to safely cross intersection ego1
+    Tc2 = (distance_2/vel2)#Time to collision 2->1
+    Ts1 = (distance_1/vel1)#Time to safely cross intersection ego1
 
-a11 = (Tc2-Ts1-1) #stop
-a12 = (Ts1-Tc2+1) #forward
+a12 = beta*(theta1*Ts1-Tc2+theta2) #stop
+a22 = beta*(Tc2-theta3*Ts1+theta4)+(1-beta)*r12 #forward
 
-#if a11 > a12:
+if a12 > a22:
+    vel1 = 0 #stop function 'k'
+    cmd_vel = 0
+    car1_odom_callback(data=x1) 
     
- #   car1_odom_callback(data=x1) 
+else #ego keeps moving forward
     
-#else #ego keeps moving forward
-
