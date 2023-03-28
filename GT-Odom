@@ -1,8 +1,11 @@
 #!/usr/bin/env python
 
+import threading
 from cmath import sqrt
 import rospy
 from nav_msgs.msg import Odometry
+from geometry_msgs.msg import Point, Twist
+
 
 x1 =0.0 
 x2 =0.0 
@@ -11,15 +14,28 @@ y2=0.0
 z1=0.0
 z2 =0.0
 
-theta1 = 1
-theta2 = 1
-theta3 = 1
-theta4 = 1
-beta = 0.5
-r12 = 1
+class PublishThread(threading.Thread):
+    def __init__(self, rate):
+        super(PublishThread, self).__init__()
+        self.publisher = rospy.Publisher('cmd_vel', Twist, queue_size = 1)
+        self.x = 0.0
+        self.y = 0.0
+        self.z = 0.0
+        self.th = 0.0
+        self.speed = 0.0
+        self.turn = 0.0
+        self.condition = threading.Condition()
+        self.done = False
 
-vel1 = 2
-vel2 = 2
+        # Set timeout to None if rate is 0 (causes new_message to wait forever
+        # for new data to publish)
+        if rate != 0.0:
+            self.timeout = 1.0 / rate
+        else:
+            self.timeout = None
+
+        self.start()
+    
 
 # define the callback function for the odom topic
 def car1_odom_callback(data):
@@ -59,9 +75,12 @@ if __name__ == '__main__':
     rospy.spin()
 
 
+
+
+
 while(1):
 
-    distance_1= sqrt((x1*x1)+(y1*y1)) #calculate distance from odom 
+    distance_1= sqrt((x1*x1)+(y1*y1))
     distance_2= sqrt((x2*x2)+(y2*y2))
 
     #def distance_2(data):
@@ -73,16 +92,15 @@ while(1):
     #def speed_1(data):
         #odom1 # from odom.twist.twist.linear.x
 
-    Tc2 = (distance_2/vel2)#Time to collision 2->1
-    Ts1 = (distance_1/vel1)#Time to safely cross intersection ego1
+    Tc2 = (distance_2/2)#Time to collision 2->1
+    Ts1 = (distance_1/2)#Time to safely cross intersection ego1
 
-a12 = beta*(theta1*Ts1-Tc2+theta2) #stop
-a22 = beta*(Tc2-theta3*Ts1+theta4)+(1-beta)*r12 #forward
+a11 = (Tc2-Ts1-1) #stop
+a12 = (Ts1-Tc2+1) #forward
 
-if a12 > a22:
-    vel1 = 0 #stop function 'k'
-    cmd_vel = 0
-    car1_odom_callback(data=x1) 
+#if a11 > a12:
     
-else #ego keeps moving forward
+ #   car1_odom_callback(data=x1) 
     
+#else #ego keeps moving forward
+
