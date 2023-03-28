@@ -61,8 +61,8 @@ if __name__ == '__main__':
     rospy.init_node('odom_subscriber')
     
     # specify the ROS master URIs of the two cars
-    rospy.set_param('car1_uri', 'http://<car1_ip_address>:11311')
-    rospy.set_param('car2_uri', 'http://<car2_ip_address>:11311')
+    rospy.set_param('car1_uri', 'http://<10.0.0.3>:11311')
+    rospy.set_param('car2_uri', 'http://<10.0.0.4>:11311')
 
      # subscribe to the first car's odom topic
     car1_odom_subscriber = rospy.Subscriber('/car1/odom', Odometry, car1_odom_callback)
