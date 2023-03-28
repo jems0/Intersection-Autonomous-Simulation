@@ -26,7 +26,7 @@ vel2 = 2
 class PublishThread(threading.Thread):
     def __init__(self, rate):
         super(PublishThread, self).__init__()
-        self.publisher = rospy.Publisher('cmd_vel', Twist, queue_size = 1)
+        self.publisher = rospy.Publisher('cmd_vel', Twist, queue_size = 10)
         self.x = 0.0
         self.y = 0.0
         self.z = 0.0
@@ -69,8 +69,8 @@ if __name__ == '__main__':
     rospy.init_node('odom_subscriber')
     
     # specify the ROS master URIs of the two cars
-    rospy.set_param('car1_uri', 'http://<car1_ip_address>:11311')
-    rospy.set_param('car2_uri', 'http://<car2_ip_address>:11311')
+    rospy.set_param('car1_uri', 'http://<10.0.0.3>:11311')
+    rospy.set_param('car2_uri', 'http://<10.0.0.4>:11311')
 
      # subscribe to the first car's odom topic
     car1_odom_subscriber = rospy.Subscriber('/car1/odom', Odometry, car1_odom_callback)
@@ -85,28 +85,26 @@ if __name__ == '__main__':
 
 while(1):
 
-    distance_1= sqrt((x1*x1)+(y1*y1)) #calculate distance from odom 
-    distance_2= sqrt((x2*x2)+(y2*y2))
+    travel_dist1 = sqrt((x1*x1)+(y1*y1)) #calculate distance from odom 
+    travel_dist2 = sqrt((x2*x2)+(y2*y2))
 
-    #def distance_2(data):
-      #  x2  # from data.pose.pose.position.x 
-    #def speed_2(data):
-       # odom2 # from odom.twist.twist.linear.x
-   # def distance_1(data):
-        #x1 # from data.pose.pose.position.x
-    #def speed_1(data):
-        #odom1 # from odom.twist.twist.linear.x
+    #Distance from collision point or the intersection point
+    distance_1 = 2 - travel_dist1
+    distance_2 = 2 - travel_dist2
 
-    Tc2 = (distance_2/vel2)#Time to collision 2->1
-    Ts1 = (distance_1/vel1)#Time to safely cross intersection ego1
+    Tc2 = (/vel2)#Time to collision 2->1
+    # Tc2 will take known distance from a reference point of car 2 
+    Ts1 = (/vel1)#Time to safely cross intersection ego1
+    # Ts1 will take known distance from a reference point of car 1
 
-a12 = beta*(theta1*Ts1-Tc2+theta2) #stop
-a22 = beta*(Tc2-theta3*Ts1+theta4)+(1-beta)*r12 #forward
+    a12 = beta*(theta1*Ts1-Tc2+theta2) #stop
+    a22 = beta*(Tc2-theta3*Ts1+theta4)+(1-beta)*r12 #forward
 
-if a12 > a22:
-    vel1 = 0 #stop function 'k'
-    cmd_vel = 0
-    car1_odom_callback(data=x1) 
+    if a12 > a22:
+        vel1 = 0 #stop function 'k'
+        cmd_vel = 0
+        car1_odom_callback(data=x1) 
     
-else #ego keeps moving forward
-    
+    else: #ego keeps moving forward
+        pass
+
