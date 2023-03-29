@@ -37,7 +37,7 @@ class PublishThread(threading.Thread):
     # publishes to the first car's cmd_vel topic
 
         self.move_cmd = Twist()
-        #self.move_cmd.linear.x = 1.0
+        self.move_cmd.linear.x = 2.0
         self.condition = threading.Condition()
         self.done = False
 
@@ -69,28 +69,6 @@ def car2_odom_callback(data):
     z2= data.pose.pose.position.z
     rospy.loginfo("Received odom data: x=%f, y=%f, z=%f", 
                   x2, y2, z2)
-
-if __name__ == '__main__':
-    # initialize the node
-    rospy.init_node('GTRobot')
-    
-    # specify the ROS master URIs of the two cars
-    rospy.set_param('car1_uri', 'http://<10.0.0.3>:11311')
-    rospy.set_param('car2_uri', 'http://<10.0.0.4>:11311')
-
-    # publishes to the first car's cmd_vel topic
-  
-
-     # subscribe to the first car's odom topic
-    car1_odom_subscriber = rospy.Subscriber('/car1/odom', Odometry, car1_odom_callback)
-    
-    # subscribe to the second car's odom topic
-    car2_odom_subscriber = rospy.Subscriber('/car2/odom', Odometry, car2_odom_callback)
-
-    
-    # spin the node to keep it running
-    rospy.spin()
-
 def Robot_movement ():
 
             publisher = PublishThread(1)
@@ -116,7 +94,7 @@ def Robot_movement ():
          
           
       
-            while robot_current_pos1 < Max_pos: 
+            while robot_current_pos1 < Max_pos:
 
             # Calculate time to collision and time to safely cross intersection
                 Tc2 = (xdistance_1/vel2) # Time to collision 2->1
@@ -131,12 +109,38 @@ def Robot_movement ():
                 if a12 > a22: # Car 1 needs to stop
                     publisher.pub.publish('[0.0, 0.0, 0.0]' '[0.0,0.0,0.0]')
                     print("Car 1 stopped!")
+                   # if distance_2 == Intersection_pos:
+                    # publisher.pub.publish('[.5.0, 0.0, 0.0]' '[0.0,0.0,0.0]')
+                     #if distance_2 >= Intersection_pos:
+                     # publisher.pub.publish('[2.0, 0.0, 0.0]' '[0.0,0.0,0.0]')
                 else: # Car 1 keeps moving forward
                     publisher.pub.publish('[4.0, 0.0, 0.0]' '[0.0,0.0,0.0]')
-                    
+                    #publisher.pub.publish(publisher.move_cmd)
                     print("Car 1 moving forward")
 
                 # Wait for 1 second before checking again
-                time.sleep(.3)
+                time.sleep(.2)
+                
+if __name__ == '__main__':
+    # initialize the node
+    rospy.init_node('GTRobot')
+    
+    # specify the ROS master URIs of the two cars
+    rospy.set_param('car1_uri', 'http://<10.0.0.3>:11311')
+    rospy.set_param('car2_uri', 'http://<10.0.0.4>:11311')
 
-Robot_movement() # Call the function to start the simulation
+
+
+    # publishes to the first car's cmd_vel topic
+  
+
+     # subscribe to the first car's odom topic
+    car1_odom_subscriber = rospy.Subscriber('/car1/odom', Odometry, car1_odom_callback)
+    
+    # subscribe to the second car's odom topic
+    car2_odom_subscriber = rospy.Subscriber('/car2/odom', Odometry, car2_odom_callback)
+
+    Robot_movement() # Call the function to start the simulation
+    
+    # spin the node to keep it running
+    rospy.spin()
