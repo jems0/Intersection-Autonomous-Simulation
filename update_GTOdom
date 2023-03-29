@@ -92,7 +92,7 @@ def Robot_movement ():
           #  xdistance_2 = distance_2.x
 
             print("distance of car 1 is ", xdistance_1)
-            print("distance of car 2 is ", xdistance_1)
+            print("distance of car 2 is ", xdistance_2)
 
             #make a code here that starts the car going forward initially
 
