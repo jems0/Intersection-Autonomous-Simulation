@@ -85,8 +85,8 @@ def Robot_movement ():
             xrobot_current_pos1 = robot_current_pos1.x
             xrobot_current_pos2 = robot_current_pos2.x
             
-            xdistance_1 =  xIntersection_Pos - robot_current_pos1 #  refers to the distance from the collision point
-            xdistance_2 =  xIntersection_Pos - robot_current_pos2
+            xdistance_1 =  xIntersection_Pos - xrobot_current_pos1 #  refers to the distance from the collision point
+            xdistance_2 =  xIntersection_Pos - xrobot_current_pos2
             
            # xdistance_1 = distance_1.x  #only extracting the x coordinate from the point 
           #  xdistance_2 = distance_2.x
