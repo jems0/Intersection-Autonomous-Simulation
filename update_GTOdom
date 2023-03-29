@@ -79,12 +79,17 @@ def Robot_movement ():
             robot_current_pos1 = Point(x1,0,0)
             robot_current_pos2 = Point(x2,0,0)
             # Distance from collision point or the intersection point
-            distance_1 = Intersection_pos - robot_current_pos1 #  refers to the distance from the collision point
-            distance_2 = Intersection_pos - robot_current_pos2
-
+           # distance_1 = Intersection_pos - robot_current_pos1 #  refers to the distance from the collision point
+           # distance_2 = Intersection_pos - robot_current_pos2
+            xIntersection_Pos =Intersection_pos.x
+            xrobot_current_pos1 = robot_current_pos1.x
+            xrobot_current_pos2 = robot_current_pos2.x
             
-            xdistance_1 = distance_1.x  #only extracting the x coordinate from the point 
-            xdistance_2 = distance_2.x
+            xdistance_1 =  xIntersection_Pos - robot_current_pos1 #  refers to the distance from the collision point
+            xdistance_2 =  xIntersection_Pos - robot_current_pos2
+            
+           # xdistance_1 = distance_1.x  #only extracting the x coordinate from the point 
+          #  xdistance_2 = distance_2.x
 
             print("distance of car 1 is ", xdistance_1)
             print("distance of car 2 is ", xdistance_1)
