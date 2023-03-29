@@ -27,13 +27,16 @@ vel2 = 2
 
 robot1_pos = Point(0,0,0)
 robot2_pos = Point(0,0,0)
-Intersection_pos = Point(2,0,0)
+Coillision_Intersection_pos = Point(1.7,0,0)
+Safety_Intersection_pos = Point(2,0,0)
+#Ts_pos= Point(2,0,0)
+#Tc_pos= Point(1.7,0,0)
 Max_pos = Point(3,0,0)
 
 class PublishThread(threading.Thread):
     def __init__(self, rate):
         super(PublishThread, self).__init__()
-        self.pub = rospy.Publisher('/car1/cmd_vel', Twist, queue_size=10) 
+        self.pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10) 
     # publishes to the first car's cmd_vel topic
 
         self.move_cmd = Twist()
@@ -81,29 +84,37 @@ def Robot_movement ():
             # Distance from collision point or the intersection point
            # distance_1 = Intersection_pos - robot_current_pos1 #  refers to the distance from the collision point
            # distance_2 = Intersection_pos - robot_current_pos2
-            xIntersection_Pos =Intersection_pos.x
+            xColIntersection_Pos =Coillision_Intersection_pos.x
+            xSafIntersection_pos = Safety_Intersection_pos.x
             xrobot_current_pos1 = robot_current_pos1.x
             xrobot_current_pos2 = robot_current_pos2.x
             
-            xdistance_1 =  xIntersection_Pos - xrobot_current_pos1 #  refers to the distance from the collision point
-            xdistance_2 =  xIntersection_Pos - xrobot_current_pos2
+            xdistance_Tc1 =  xColIntersection_Pos - xrobot_current_pos1 #  refers to the distance from the collision point
+            xdistance_Ts1 =  xSafIntersection_Pos - xrobot_current_pos1
             
-           # xdistance_1 = distance_1.x  #only extracting the x coordinate from the point 
-          #  xdistance_2 = distance_2.x
+            xdistance_Tc2 =  xColIntersection_Pos - xrobot_current_pos2 #  refers to the distance from the collision point
+            xdistance_Ts2 =  xSafIntersection_Pos - xrobot_current_pos2
+            
+            xdistance_1 = distance_1.x  #only extracting the x coordinate from the point 
+            xdistance_2 = distance_2.x
 
-            print("distance of car 1 is ", xdistance_1)
-            print("distance of car 2 is ", xdistance_2)
-
+            print("distance of car 1 collision point is ", xdistance_Tc2)
+            print("distance of car 1 safety point is ", xdistance_Ts2)
+            
+            print("distance of car 2 collision point is ", xdistance_Tc2)
+            print("distance of car 2 safety point is ", xdistance_Ts2)
+            
             #make a code here that starts the car going forward initially
 
          
           
-      
+            print("velocity", publisher.move_cmd)
+                        
             while xrobot_current_pos1 < Max_pos.x:
 
             # Calculate time to collision and time to safely cross intersection
-                Tc2 = (xdistance_1/vel2) # Time to collision 2->1
-                Ts1 = (xdistance_2/vel1) # Time to safely cross intersection ego1
+                Tc2 = (xdistance_Tc2/vel2) # Time to collision 2->1
+                Ts2 = (xdistance_Ts2/vel1) # Time to safely cross intersection ego1
 
             # Calculate acceleration values
                 a12 = beta*(theta1*Ts1-Tc2+theta2) # Stop
@@ -112,15 +123,15 @@ def Robot_movement ():
                 # Make decision based on acceleration values
 
                 if a12 > a22: # Car 1 needs to stop
-                    publisher.pub.publish('[0.0, 0.0, 0.0]' '[0.0,0.0,0.0]')
+                    publisher.pub.publish('[0.0, 0.0, 0.0]' ,'[0.0,0.0,0.0]')
                     print("Car 1 stopped!")
                    # if distance_2 == Intersection_pos:
                     # publisher.pub.publish('[.5.0, 0.0, 0.0]' '[0.0,0.0,0.0]')
                      #if distance_2 >= Intersection_pos:
                      # publisher.pub.publish('[2.0, 0.0, 0.0]' '[0.0,0.0,0.0]')
                 else: # Car 1 keeps moving forward
-                    publisher.pub.publish('[4.0, 0.0, 0.0]' '[0.0,0.0,0.0]')
-                    #publisher.pub.publish(publisher.move_cmd)
+                    #publisher.pub.publish('[4.0, 0.0, 0.0]', '[0.0,0.0,0.0]')
+                    publisher.pub.publish(publisher.move_cmd)
                     print("Car 1 moving forward")
 
                 # Wait for 1 second before checking again
