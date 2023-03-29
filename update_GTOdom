@@ -114,8 +114,9 @@ def Robot_movement ():
 
             # Calculate time to collision and time to safely cross intersection
                 Tc2 = (xdistance_Tc2/vel2) # Time to collision 2->1
-                Ts2 = (xdistance_Ts2/vel1) # Time to safely cross intersection ego1
-
+                Ts2 = (xdistance_Ts2/vel2) # Time to safely cross intersection ego1
+                Tc1 = (xdistance_Tc1/vel1) # Time to collision 2->1
+                Ts1 = (xdistance_Ts2/vel1) # Time to safely cross intersection ego1
             # Calculate acceleration values
                 a12 = beta*(theta1*Ts1-Tc2+theta2) # Stop
                 a22 = beta*(Tc2-theta3*Ts1+theta4)+(1-beta)*r12 # Forward
