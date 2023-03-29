@@ -116,7 +116,7 @@ def Robot_movement ():
          
           
       
-            while True: 
+            while robot_current_pos1 < Max_pos: 
 
             # Calculate time to collision and time to safely cross intersection
                 Tc2 = (xdistance_1/vel2) # Time to collision 2->1
