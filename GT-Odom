@@ -92,9 +92,9 @@ while(1):
     distance_1 = 2 - travel_dist1
     distance_2 = 2 - travel_dist2
 
-    Tc2 = (/vel2)#Time to collision 2->1
+    Tc2 = (distance_2/vel2)#Time to collision 2->1
     # Tc2 will take known distance from a reference point of car 2 
-    Ts1 = (/vel1)#Time to safely cross intersection ego1
+    Ts1 = (distance_1/vel1)#Time to safely cross intersection ego1
     # Ts1 will take known distance from a reference point of car 1
 
     a12 = beta*(theta1*Ts1-Tc2+theta2) #stop
