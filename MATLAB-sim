@@ -1,0 +1,100 @@
+theta1 = 1;
+theta2 = 1;
+theta3 = 1;
+theta4 = 1;
+beta = 0.5;
+r12 = 1;
+
+rect_size = [0.5 0.5];
+
+% Define the initial positions and velocities of the dots
+pos1 = [-5 0]; % starting position of dot 1 (on the left side of the plot)
+pos2 = [0 -5]; % starting position of dot 2 (in the middle of the y-axis)
+vel1 = [0.1 0]; % velocity vector for dot 1 (moves right horizontally)
+vel2_orig = [0 0.1]; % original velocity vector for dot 2 (moves up vertically)
+vel2 = vel2_orig; % current velocity vector for dot 2 (initially set to original velocity)
+r = 1; % radius of dots
+collision_point = [0 0];
+safety_point = [3 0];
+
+% Set up the figure
+fig = figure;
+axis([-5 5 -5 5]);
+grid on;
+hold on;
+%myVideo = VideoWriter('myVideoFile');
+%open(myVideo)
+
+% Plot the initial positions of the dots
+h1 = rectangle('Position', [pos1-rect_size/2 rect_size], 'FaceColor', 'blue');
+h2 = rectangle('Position', [pos2-rect_size/2 rect_size], 'FaceColor', 'red');
+%h1 = plot(pos1(1), pos1(2), 'bo', 'MarkerFaceColor', 'blue');
+%h2 = plot(pos2(1), pos2(2), 'ro', 'MarkerFaceColor', 'red');
+
+% Initialize the trails
+h1_trail = plot(pos1(1), pos1(2), 'b-', 'LineWidth', 5, 'Color', [0 0 1 0.5]);
+h2_trail = plot(pos2(1), pos2(2), 'r-', 'LineWidth', 5, 'Color', [1 0 0 0.5]);
+
+holdd = zeros(1,100);
+hold2 = holdd;
+% Move the dots
+for t = 1:100
+    % Update the position of dot 1
+    pos1 = pos1 + vel1;
+    
+    Ts1 = safety_point - pos2(2);
+    Tc2 = collision_point - pos1(2);
+    a12 = beta*(theta1*Ts1-Tc2+theta2); % Stop
+    a22 = beta*(Tc2-theta3*Ts1+theta4)+(1-beta)*r12; % Forward
+    
+    % Calculate the optimal velocity for dot 2
+    distance = norm(pos1 - pos2); 
+    
+%    fprintf('a12: %f, a22: %f, distance: %f\n', a12, a22, distance);
+
+    if distance < 1 && all(a12 > a22) 
+        
+        vel2 = [0 0]; % stop moving
+        pos2 = pos2 + vel2; % dot 1 cannot move backwards
+        
+        else
+            vel2 = vel2_orig; % update velocity of dot 1
+            pos2 = pos2+ vel2; % update the position of dot 1
+
+    end
+    
+    
+    holdd(t) = vel2(2);
+    
+    % Update the trails
+    set(h1_trail, 'XData', [get(h1_trail, 'XData') pos1(1)], 'YData', [get(h1_trail, 'YData') pos1(2)]);
+    set(h2_trail, 'XData', [get(h2_trail, 'XData') pos2(1)], 'YData', [get(h2_trail, 'YData') pos2(2)]);
+    % Update the plot
+    %set(h1, 'XData', pos1(1), 'YData', pos1(2));
+    %set(h2, 'XData', pos2(1), 'YData', pos2(2));
+    set(h1, 'Position', [pos1-rect_size/2 rect_size]);
+    set(h2, 'Position', [pos2-rect_size/2 rect_size]);
+    %plot3(set(h1, 'Position', [pos1-rect_size/2 rect_size]),set(h2, 'Position', [pos2-rect_size/2 rect_size]));
+    
+    pause(0.1);
+end
+
+
+
+dxholdd = diff(holdd);
+figure;
+subplot(2,1,1)
+plot(dxholdd)
+title('Acceleration')
+xlabel('Time')
+ylabel('(m/s^2)')
+grid on
+subplot(2,1,2)
+plot(holdd,"Linewidth", 1.5)
+title('Velocity')
+xlabel('Time')
+ylabel('(m/s)')
+grid on
+xlim([0, 101])
+ylim([-.05 .15])
+
